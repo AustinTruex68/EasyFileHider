@@ -1,0 +1,8 @@
+[{
+	"id":"EasyFileHider",
+	"caption":"EasyFileHider",
+	"children":[{
+		"caption":"Hide Files",
+		"command":"easy_file_hider"
+	}]
+}]
