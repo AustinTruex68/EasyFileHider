@@ -5,21 +5,16 @@ from collections import OrderedDict
 
 
 class EasyFileHider(sublime_plugin.TextCommand):
-	settingsHolder = 'EasyFileHider/settingsHolder.json'
+	settingsHolder = 'settingsHolder.json'
+	packageSettings = 'EasyFileHider.sublime-settings'
+	userSettings = 'Preferences.sublime-settings'
 	def run(self, edit):
 		settings = '{ "file_exclude_patterns": [] }'
 		fep = "file_exclude_patterns"
 
 		def fetch_current_text():
-			try:
-				fileHolder = open(self.settingsHolder, 'r+')
-				setting = json.load(fileHolder)
-			except Exception as e:
-				fileHolder = open(self.settingsHolder, 'w')
-				setting = json.loads(settings)
-
-			return ",".join(map(str, setting[fep]))
-
+			currentSettings = sublime.load_settings(self.packageSettings)
+			return ",".join(map(str, currentSettings.get(fep)))
 
 		def on_done(input_string):
 			self.text = input_string
@@ -32,34 +27,17 @@ class EasyFileHider(sublime_plugin.TextCommand):
 			print("User canceled the input")
 
 		def write_new_set():
-			# open placeholder file
-			try:
-				fileHolder = open(self.settingsHolder, 'r+')
-				setting = json.load(fileHolder)
-			except Exception as e:
-				fileHolder = open(self.settingsHolder, 'w')
-				setting = json.loads(settings)
-
-			# clear out the current file
-			fileHolder.close()
-			fileHolder = open(self.settingsHolder, 'w')
-
-			# write new to temp file
 			values = self.text.replace(" ", "").split(',')
 			values = list(OrderedDict.fromkeys(values))
-
 			if values[0] == "" or values[0] == " ":
-				setting[fep] = []
-			else:
-				setting[fep] = values
+				values = []
 
-			json.dump(setting, fileHolder)
-
-			# fetch and save settings
-			userSettings = sublime.load_settings("Preferences.sublime-settings")
-			userSettings.erase(fep)
-			userSettings.set(fep, setting[fep])
-			sublime.save_settings("Preferences.sublime-settings")
+			uSet = sublime.load_settings(self.userSettings)
+			currentSettings = sublime.load_settings(self.packageSettings)
+			currentSettings.set(fep, values)
+			uSet.set(fep, values)
+			sublime.save_settings(self.packageSettings)
+			sublime.save_settings(self.userSettings)
 
 
 		window = self.view.window()
