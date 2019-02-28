@@ -5,7 +5,6 @@ from collections import OrderedDict
 
 
 class EasyFileHider(sublime_plugin.TextCommand):
-	settingsHolder = 'settingsHolder.json'
 	packageSettings = 'EasyFileHider.sublime-settings'
 	userSettings = 'Preferences.sublime-settings'
 	def run(self, edit):
