@@ -26,10 +26,8 @@ class EasyFileHider(sublime_plugin.TextCommand):
 			print("User canceled the input")
 
 		def write_new_set():
-			values = self.text.replace(" ", "").split(',')
-			values = list(OrderedDict.fromkeys(values))
-			if values[0] == "" or values[0] == " ":
-				values = []
+			values = [v.strip() for v in self.text.split(',')]
+			values = list(OrderedDict.fromkeys(v for v in values if v))
 
 			uSet = sublime.load_settings(self.userSettings)
 			currentSettings = sublime.load_settings(self.packageSettings)
